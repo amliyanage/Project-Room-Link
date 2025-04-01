@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView , Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -41,7 +41,7 @@ export default function HomePage() {
 
       <View style={styles.mainPowerContainer}>
         <TouchableOpacity
-          style={[styles.mainPowerButton, { opacity: mainPower ? 1 : 0.7 }]}
+          style={[styles.mainPowerButton, { opacity: mainPower ? 1 : 0.7 }, { borderColor: mainPower ? '#4CAF50' : '#F44336' }]}
           onPress={() => setMainPower(!mainPower)}
         >
           <Ionicons name="power" size={40} color={mainPower ? '#4CAF50' : '#F44336'} />
@@ -63,12 +63,16 @@ export default function HomePage() {
       </View>
 
       <LinearGradient
-        colors={['#87CEEB', '#4169E1']}
+        colors={['#00D2FF', '#3A7BD5']}
         style={styles.temperatureCard}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
       >
         <View style={styles.temperatureContent}>
+        <Image
+        source={require('../../assets/sun-icon.png')}
+        style={styles.img}
+      />
           <Text style={styles.temperature}>27°</Text>
           <View>
             <Text style={styles.tempLabel}>Normal Temp</Text>
@@ -77,7 +81,7 @@ export default function HomePage() {
               <Text style={styles.location}>In Your Room</Text>
             </View>
           </View>
-          <Ionicons name="sunny" size={24} color="white" />
+          <Ionicons name="sunny" size={44} color="white" />
         </View>
       </LinearGradient>
     </SafeAreaView>
@@ -155,9 +159,11 @@ const styles = StyleSheet.create({
   temperatureCard: {
     borderRadius: 20,
     padding: 20,
+    height: 130,
     marginTop: 'auto',
   },
   temperatureContent: {
+    height: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -180,4 +186,9 @@ const styles = StyleSheet.create({
     color: 'white',
     marginLeft: 5,
   },
+  img : {
+    position: 'absolute',
+    top: -20,
+    left: 120,
+  }
 }); 
