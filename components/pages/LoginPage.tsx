@@ -1,36 +1,25 @@
-import { useNavigation } from "@react-navigation/native";
-import { Text, View, StyleSheet, ImageBackground , TouchableOpacity } from "react-native";
-import { StackNavigationProp } from '@react-navigation/stack'; 
+import { ImageBackground, View, StyleSheet , Text , TouchableOpacity } from "react-native";
+import { TextInput } from "react-native-gesture-handler";
 
-type RootStackParamList = {
-    StartPage: undefined;
-    LoginPage: undefined;
-};
-
-const StartPage = () => {
-    const navigation = useNavigation<StackNavigationProp<RootStackParamList, 'StartPage'>>();
-
-    const handleGetStart = () => {
-        navigation.navigate('LoginPage'); // Now this will work correctly
-    };
-
+const LoginPage = () => {
     return (
         <ImageBackground
-            source={require('../../assets/page-bg/start-page.png')}
+            source={require('../../assets/page-bg/login-page.png')}
             style={styles.backgroundImage}
             resizeMode="cover"
         >
             <View style={styles.container}>
-                <Text style={styles.mainText}>Welcome to Room Link</Text>
-                <Text style={styles.para}>" Control your lights and plugs, automate your home, and monitor energy usage effortlessly. "</Text>
-                <TouchableOpacity style={styles.button} onPress={handleGetStart}>
-                    <Text style={styles.buttonText}>Get Start</Text>
+                <Text style={styles.mainText}>Login to Room Link</Text>
+                <Text style={styles.para}>“ Login to System to get a control ”</Text>
+                <TextInput style={styles.input} placeholder="System Email" placeholderTextColor={"#fff"} />
+                <TextInput style={styles.input} placeholder="System Password" placeholderTextColor={"#fff"} />
+                <TouchableOpacity style={styles.button}>
+                    <Text style={styles.buttonText}>Login</Text>
                 </TouchableOpacity>
             </View>
         </ImageBackground>
     )
 }
-
 
 const styles = StyleSheet.create({
     backgroundImage: {
@@ -50,7 +39,6 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 23,
         fontWeight: 600,
-        paddingBottom: 20,
     },
     para : {
         color: '#fff',
@@ -73,7 +61,17 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         paddingVertical: 14,
         letterSpacing: 0.42
+    },
+    input : {
+        backgroundColor: 'rgba(191, 151, 107, 0.6)',
+        width: '100%',
+        paddingVertical: 14,
+        paddingHorizontal: 11,
+        marginBottom: 27,
+        color: '#fff',
+        fontSize: 13,
+        borderRadius: 10
     }
   });
 
-export default StartPage;
+export default LoginPage;

@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Layout } from 'react-native-reanimated';
 import StartPage from './components/pages/StartPage';
+import LoginPage from './components/pages/LoginPage';
 
 const Stack = createStackNavigator();
 
@@ -29,6 +30,7 @@ export default function App() {
         }}
       >
         <Stack.Screen name="StartPage" component={StartPage} />
+        <Stack.Screen name="LoginPage" component={LoginPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );
