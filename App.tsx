@@ -5,6 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { Layout } from 'react-native-reanimated';
 import StartPage from './components/pages/StartPage';
 import LoginPage from './components/pages/LoginPage';
+import HomePage from './components/pages/HomePage';
 
 const Stack = createStackNavigator();
 
@@ -31,7 +32,9 @@ export default function App() {
       >
         <Stack.Screen name="StartPage" component={StartPage} />
         <Stack.Screen name="LoginPage" component={LoginPage} />
+        <Stack.Screen name="HomePage" component={HomePage} />
       </Stack.Navigator>
+      <StatusBar style="light" />
     </NavigationContainer>
   );
 }

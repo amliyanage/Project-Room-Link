@@ -1,7 +1,20 @@
 import { ImageBackground, View, StyleSheet , Text , TouchableOpacity } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
+import { StackNavigationProp } from '@react-navigation/stack'; 
+import { useNavigation } from "@react-navigation/native";
+
+type RootStackParamList = {
+    StartPage: undefined;
+    LoginPage: undefined;
+    HomePage: undefined;
+};
 
 const LoginPage = () => {
+    const navigation = useNavigation<StackNavigationProp<RootStackParamList, 'HomePage'>>();
+
+    const handleGetStart = () => {
+        navigation.navigate('HomePage'); // Now this will work correctly
+    };
     return (
         <ImageBackground
             source={require('../../assets/page-bg/login-page.png')}
@@ -13,7 +26,7 @@ const LoginPage = () => {
                 <Text style={styles.para}>“ Login to System to get a control ”</Text>
                 <TextInput style={styles.input} placeholder="System Email" placeholderTextColor={"#fff"} />
                 <TextInput style={styles.input} placeholder="System Password" placeholderTextColor={"#fff"} />
-                <TouchableOpacity style={styles.button}>
+                <TouchableOpacity style={styles.button} onPress={handleGetStart}>
                     <Text style={styles.buttonText}>Login</Text>
                 </TouchableOpacity>
             </View>
