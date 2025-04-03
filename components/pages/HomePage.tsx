@@ -1,13 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView , Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { get, getDatabase, ref, set } from 'firebase/database';
+import { initializeApp } from 'firebase/app';
 
 interface UnitProps {
   number: number;
   power: boolean;
   onPress: () => void;
 }
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDFlIfVGNnMghi1mCYpIwBP7K-Nn7dnxsw",
+  authDomain: "room-controller-455409.firebaseapp.com",
+  databaseURL: "https://room-controller-455409-default-rtdb.firebaseio.com",
+  projectId: "room-controller-455409",
+  storageBucket: "room-controller-455409.firebasestorage.app",
+  messagingSenderId: "61515720724",
+  appId: "1:61515720724:web:05aeee59a97ee9c4085f01"
+};
 
 const Unit = ({ number, power, onPress }: UnitProps) => (
   <TouchableOpacity style={[styles.unit , { borderColor: power ? '#4CAF50' : '#F44336' }]} onPress={onPress}>
@@ -19,14 +31,92 @@ const Unit = ({ number, power, onPress }: UnitProps) => (
 );
 
 export default function HomePage() {
-  const [mainPower, setMainPower] = React.useState(true);
+  const [mainPower, setMainPower] = React.useState(false);
   const [units, setUnits] = React.useState(Array(6).fill(true));
 
   const toggleUnit = (index: number) => {
-    const newUnits = [...units];
-    newUnits[index] = !newUnits[index];
-    setUnits(newUnits);
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const result = units[index] ? 'OFF' : 'ON';
+    set(ref(database, `/relay${index + 1}`), result)
+      .then(() => {
+        units[index] = !units[index];
+        setUnits([...units]);
+      }).catch((error) => {
+        console.error('Error writing to database:', error);
+      })
   };
+
+  useEffect(() => {
+    const relay1 = ref(getDatabase(), '/relay1');
+    const relay2 = ref(getDatabase(), '/relay2');
+    const relay3 = ref(getDatabase(), '/relay3');
+    const relay4 = ref(getDatabase(), '/relay4');
+
+    get(relay1).then((snapshot) => {
+      if (snapshot.exists()) {
+        units[0] = snapshot.val() === 'ON';
+        setUnits([...units]);
+      } else {
+        console.log('No data available for relay1');
+      }
+    }).catch((error) => {
+      console.error('Error fetching relay1 data:', error);
+    })
+
+    get(relay2).then((snapshot) => {
+      if (snapshot.exists()) {
+        units[1] = snapshot.val() === 'ON';
+        setUnits([...units]);
+      } else {
+        console.log('No data available for relay2');
+      }
+    }).catch((error) => {
+      console.error('Error fetching relay2 data:', error);
+    })
+
+    get(relay3).then((snapshot) => {
+      if (snapshot.exists()) {
+        units[2] = snapshot.val() === 'ON';
+        setUnits([...units]);
+      } else {
+        console.log('No data available for relay3');
+      }
+    }).catch((error) => {
+      console.error('Error fetching relay3 data:', error);
+    })
+
+    get(relay4).then((snapshot) => {
+      if (snapshot.exists()) {
+        units[3] = snapshot.val() === 'ON';
+        setUnits([...units]);
+      } else {
+        console.log('No data available for relay4');
+      }
+    }).catch((error) => {
+      console.error('Error fetching relay4 data:', error);
+    })
+
+  }, []);
+
+  const toggleMainPower = () => {
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+      const result = mainPower ? 'OFF' : 'ON';
+      
+      for (let i = 0 ; i < 4 ; i++){
+        set(ref(database, `/relay${i + 1}`), result)
+          .then(() => {
+            units[i] = !mainPower;
+            setUnits([...units]);
+          }).catch((error) => {
+            console.error('Error writing to database:', error);
+          })
+      }
+
+      setMainPower(!mainPower);
+  }
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -42,7 +132,7 @@ export default function HomePage() {
       <View style={styles.mainPowerContainer}>
         <TouchableOpacity
           style={[styles.mainPowerButton, { opacity: mainPower ? 1 : 0.7 }, { borderColor: mainPower ? '#4CAF50' : '#F44336' }]}
-          onPress={() => setMainPower(!mainPower)}
+          onPress={() => toggleMainPower()}
         >
           <Ionicons name="power" size={40} color={mainPower ? '#4CAF50' : '#F44336'} />
         </TouchableOpacity>
