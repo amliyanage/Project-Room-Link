@@ -33,89 +33,71 @@ const Unit = ({ number, power, onPress }: UnitProps) => (
 export default function HomePage() {
   const [mainPower, setMainPower] = React.useState(false);
   const [units, setUnits] = React.useState(Array(6).fill(true));
+  const app = initializeApp(firebaseConfig);
+  const database = getDatabase(app); 
 
   const toggleUnit = (index: number) => {
-    const app = initializeApp(firebaseConfig);
-    const database = getDatabase(app);
     const result = units[index] ? 'OFF' : 'ON';
-    set(ref(database, `/relay${index + 1}`), result)
+    const relayRef = ref(database, `/relayArry/relay${index + 1}`);
+    
+    set(relayRef, result)
       .then(() => {
-        units[index] = !units[index];
-        setUnits([...units]);
-      }).catch((error) => {
-        console.error('Error writing to database:', error);
+        const updatedUnits = [...units];
+        updatedUnits[index] = !units[index];
+        setUnits(updatedUnits);
       })
+      .catch((error) => {
+        console.error('Error writing to database:', error);
+      });
   };
+  
 
   useEffect(() => {
-    const relay1 = ref(getDatabase(), '/relay1');
-    const relay2 = ref(getDatabase(), '/relay2');
-    const relay3 = ref(getDatabase(), '/relay3');
-    const relay4 = ref(getDatabase(), '/relay4');
+    const relayArry = ref(getDatabase(), '/relayArry');
 
-    get(relay1).then((snapshot) => {
-      if (snapshot.exists()) {
-        units[0] = snapshot.val() === 'ON';
-        setUnits([...units]);
-      } else {
-        console.log('No data available for relay1');
-      }
-    }).catch((error) => {
-      console.error('Error fetching relay1 data:', error);
-    })
+    get(relayArry).then((snapshot) => {
+      if (snapshot.exists()){
+        console.log(snapshot.val())
+        const result : {
+          relay1 : string,
+          relay2 : string,
+          relay3 : string,
+          relay4 : string,
+        } = snapshot.val();
 
-    get(relay2).then((snapshot) => {
-      if (snapshot.exists()) {
-        units[1] = snapshot.val() === 'ON';
-        setUnits([...units]);
-      } else {
-        console.log('No data available for relay2');
-      }
-    }).catch((error) => {
-      console.error('Error fetching relay2 data:', error);
-    })
+        setUnits(
+          [result.relay1 === 'ON', result.relay2 === 'ON', result.relay3 === 'ON', result.relay4 === 'ON']
+        )
 
-    get(relay3).then((snapshot) => {
-      if (snapshot.exists()) {
-        units[2] = snapshot.val() === 'ON';
-        setUnits([...units]);
-      } else {
-        console.log('No data available for relay3');
-      }
-    }).catch((error) => {
-      console.error('Error fetching relay3 data:', error);
-    })
+        setMainPower(result.relay1 === 'ON' && result.relay2 === 'ON' && result.relay3 === 'ON' && result.relay4 === 'ON')
 
-    get(relay4).then((snapshot) => {
-      if (snapshot.exists()) {
-        units[3] = snapshot.val() === 'ON';
-        setUnits([...units]);
-      } else {
-        console.log('No data available for relay4');
       }
-    }).catch((error) => {
-      console.error('Error fetching relay4 data:', error);
-    })
+    });
+
 
   }, []);
 
   const toggleMainPower = () => {
-      const app = initializeApp(firebaseConfig);
-      const database = getDatabase(app);
-      const result = mainPower ? 'OFF' : 'ON';
-      
-      for (let i = 0 ; i < 4 ; i++){
-        set(ref(database, `/relay${i + 1}`), result)
-          .then(() => {
-            units[i] = !mainPower;
-            setUnits([...units]);
-          }).catch((error) => {
-            console.error('Error writing to database:', error);
-          })
-      }
-
-      setMainPower(!mainPower);
-  }
+    const result = mainPower ? 'OFF' : 'ON';
+    const newUnits = [...units];
+  
+    const updates = units.map((_, index) => {
+      const relayRef = ref(database, `/relayArry/relay${index + 1}`);
+      return set(relayRef, result)
+        .then(() => {
+          newUnits[index] = result === 'ON';
+        });
+    });
+  
+    Promise.all(updates)
+      .then(() => {
+        setUnits(newUnits);
+        setMainPower(result === 'ON');
+      })
+      .catch((error) => {
+        console.error('Error updating all relays:', error);
+      });
+  };
 
 
   return (
